@@ -1,5 +1,15 @@
 # Gramlot Standalone
 
+## Try the unified showcase
+
+Download or copy [showcase.zip](showcase.zip), extract the whole archive and open
+`showcase/index.html`. The original shared showcase shell and lessons are included,
+with local runtime, Source viewer and Inspector. The RPC lesson reports that a
+Python backend is unavailable; other lessons run locally. See
+[offline showcase](docs/030-showcase.md) and [verification](examples/showcase/VERIFICATION.md).
+This PoC-based directory export is separate from the pending generic single-file
+compiler integration described below.
+
 `gramlot-standalone` is the offline packaging layer for Python-authored Gramlot
 projects. Its intended command is:
 
