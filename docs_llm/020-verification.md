@@ -1,37 +1,32 @@
-# 020 · Verification status
+# 020 · Verification
 
 Document ID: **GS-020**.
 
-[Expanded counterpart](../docs/020-verification.md).
-
 <a id="gs-020-005"></a>
+## 005 · Automated checks
 
-## 005 · Standalone-owned checks
-
-Block ID: **GS-020-005**.
-
-On 2026-09-16, 13 unit tests passed. Compilation, TOML and doc-pair checks passed.
-Coverage includes no-output failures, input containment/CSS bounds, envelope limits,
-provider gates, safe deterministic embedding and atomic file replacement.
+`npm test` checks output, no build-time Page execution, rejected Python/Node-only
+inputs, CLI use and preservation of existing output on failure.
+`scripts/verify_native_html_browser.mjs` opens an actual exported artifact from file,
+blocks HTTP(S), and checks main, Source mutations, optional remote Source and dispose.
 
 <a id="gs-020-010"></a>
+## 010 · Status
 
-## 010 · Distribution checks
+Local verification, 2026-09-21: all three exporter tests pass. The npm tarball is
+installed in gramlot-examples Hello World; its build:standalone command succeeds
+and its existing host test passes. Chrome153.0.8010.48 opens the exported Hello World
+with blocked HTTP(S), typed main, Source updates/insertion/deletion and Worker cleanup.
+Chrome and Playwright WebKit26.6 also pass the source-live artifact, including a
+marked remote Source method executed in the Worker. WebKit is not Safari.
 
-Block ID: **GS-020-010**.
-
-CPython 3.12.9 built sdist/wheel offline with local dependencies. An isolated wheel
-zip-import loaded CLI/envelope, round-tripped data and reported version 0.0.0.dev0.
-Artifacts stay outside the repository; no release/publication occurred. An offline
-`file://` JSDOM fixture smoke verified base64 execution, JSON reconstruction and zero
-requests/injection/errors; it verifies packaging only, not CSP or Gramlot behavior.
+The 2026-09-21 verified graph used local archives: core0.0.0-dev.1, Builder JS0.1.3,
+Bag JS0.5.2 (gramlot-strict-source artifact) and TYTX0.15.0. The new exporter is
+0.0.0-dev.1. No manifest pin or lockfile was retained. Local installation is not
+proof of fresh upstream availability; no package was published. Current native
+0.1.0 delivery uses the local `@gramlot/native-html` 0.1.0 archive; see the
+[artifact handoff](https://github.com/gramlot-org/gramlot/blob/main/docs/internal/135-release-handoff.md).
+Do not equate the historical PoC showcase or the old eight-profile matrix with
+verification of this exporter. Safari and Firefox remain unverified.
 
 <a id="gs-020-015"></a>
-
-## 015 · Deliberately unverified integration
-
-Block ID: **GS-020-015**.
-
-The fixture is not a runtime. With no accepted core provider, Gramlot Source/Data,
-logic, resolver, page, print and updated-HTML behavior is unverified. JSDOM packaging
-smoke cannot satisfy the real blocked-network browser gate **GS-015-030**.

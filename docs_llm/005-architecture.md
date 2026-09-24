@@ -1,46 +1,35 @@
-# 005 · Architecture and current status
+# 005 · Architecture
 
 Document ID: **GS-005**.
 
-[Expanded counterpart](../docs/005-architecture.md).
-
 <a id="gs-005-005"></a>
-
 ## 005 · Responsibility boundary
 
-Block ID: **GS-005-005**.
-
-Standalone owns validation, embedding, packaging and its envelope. Core owns Source,
-Data Bags, logic, resolvers, typed transport and browser behavior. The synchronous
-provider callable is a consumer proposal, not an accepted core API.
+Standalone owns build-time bundling, atomic output and HTML packaging. It uses
+HtmlBuilder from Builder JS. It does not implement Source, rendering, messaging
+or page execution: these belong to Gramlot's WorkerHost, mount and WorkerTransport.
 
 <a id="gs-005-010"></a>
+## 010 · Current profile
 
-## 010 · Complete offline profile
-
-Block ID: **GS-005-010**.
-
-The full profile includes pages/navigation, bindings, logic, browser resolvers,
-shared Data, atomic import, unified print and updated HTML. It rejects server
-behavior. CSP blocks connections and resources are embedded, but provider metadata
-is not proof; real blocked-network browser verification remains required.
+One JS Page, one classic bundled Worker, one browser runtime and one HTML file.
+The module is bundled, not imported/executed by the exporter. At runtime mount
+opens the page, prepares Gramlot, calls main and renders the returned typed Source.
+Marked Source methods use that same host through messages, without HTTP.
 
 <a id="gs-005-015"></a>
-
 ## 015 · Data boundary
 
-Block ID: **GS-005-015**.
-
-Only `application_data` is exported. Its versioned payload is opaque to standalone
-and requires the core typed Bag codec. Complete validation precedes atomic replace;
-failure preserves current Data. UI/service state is excluded.
+Database and application-data import/export are excluded. The former envelope and
+complete-v1 provider are removed from the active package, not emulated.
 
 <a id="gs-005-020"></a>
+## 020 · Limits
 
-## 020 · Verified and blocked scope
+Python pages require Python servers. Node-specific imports fail browser bundling.
+Page.css must be empty. CSP blocks network connections; it is not a static proof
+that application code never attempts a request. The exporter has no custom runtime,
+manual application DOM construction, eval bootstrap or fallback compiler.
 
-Block ID: **GS-005-020**.
-
-Tests cover standalone-owned contracts with a non-runtime fixture. Clean core lacks
-accepted integration ports, so default builds fail without output and no end-to-end
-offline/PDF behavior is claimed. See **GS-015**.
+Runtime license notices are embedded as inert JSON metadata in the HTML head,
+not as a visible panel in the application.

@@ -1,55 +1,32 @@
-# 020 · Verification status
+# 020 · Verification
 
 Document ID: **GS-020**.
 
-[Concise counterpart](../docs_llm/020-verification.md).
-
 <a id="gs-020-005"></a>
+## 005 · Automated checks
 
-## 005 · Standalone-owned checks
-
-Block ID: **GS-020-005**.
-
-Verified on 2026-09-16:
-
-- 13 `unittest` cases pass under the staged source tree.
-- Python source and tests compile successfully.
-- `pyproject.toml` parses and all four maintained guide pairs share document IDs.
-- Tests cover missing provider/no output, unsafe CSS/no output, page/resource symlink
-  escape, bounded CSS diagnostics, envelope duplicates/cycles/depth/detachment,
-  site/schema/codec checks, provider profile and finite JSON, deterministic HTML,
-  raw-text-safe runtime/source embedding, output/receipt collision and atomic replace.
+`npm test` checks output, no build-time Page execution, rejected Python/Node-only
+inputs, CLI use and preservation of existing output on failure.
+`scripts/verify_native_html_browser.mjs` opens an actual exported artifact from file,
+blocks HTTP(S), and checks main, Source mutations, optional remote Source and dispose.
 
 <a id="gs-020-010"></a>
+## 010 · Status
 
-## 010 · Distribution checks
+Local verification, 2026-09-21: all three exporter tests pass. The npm tarball is
+installed in gramlot-examples Hello World; its build:standalone command succeeds
+and its existing host test passes. Chrome153.0.8010.48 opens the exported Hello World
+with blocked HTTP(S), typed main, Source updates/insertion/deletion and Worker cleanup.
+Chrome and Playwright WebKit26.6 also pass the source-live artifact, including a
+marked remote Source method executed in the Worker. WebKit is not Safari.
 
-Block ID: **GS-020-010**.
-
-Using CPython 3.12.9 with local build dependencies and no network, `python -m build
---no-isolation` produced an sdist and a `py3-none-any` wheel. An isolated `-I`
-zip-import check loaded the wheel's CLI and envelope modules, round-tripped an
-envelope, and reported CLI version `0.0.0.dev0`.
-
-Build outputs are verification artifacts outside the repository and are excluded by
-`.gitignore`; they are not releases or publications.
-
-A packaging-only JSDOM smoke opened the fixture HTML at a `file://` URL with an
-offline resource loader and throwing `fetch`. The base64 runtime containing a
-mixed-case `</ScRiPt>` sequence executed as text, embedded JSON reconstructed its
-`</script>` value, no image injection occurred, and no request or JSDOM error was
-recorded. This verifies HTML encoding/bootstrapping only, not CSP or Gramlot runtime
-behavior. The fixture HTML remains outside the repository.
+The 2026-09-21 verified graph used local archives: core0.0.0-dev.1, Builder JS0.1.3,
+Bag JS0.5.2 (gramlot-strict-source artifact) and TYTX0.15.0. The new exporter is
+0.0.0-dev.1. No manifest pin or lockfile was retained. Local installation is not
+proof of fresh upstream availability; no package was published. Current native
+0.1.0 delivery uses the locally prepared `@gramlot/native-html` 0.1.0 archive;
+see the core's [artifact handoff](https://github.com/gramlot-org/gramlot/blob/main/docs/internal/135-release-handoff.md).
+Do not equate the historical PoC showcase or the old eight-profile matrix with
+verification of this exporter. Safari and Firefox remain unverified.
 
 <a id="gs-020-015"></a>
-
-## 015 · Deliberately unverified integration
-
-Block ID: **GS-020-015**.
-
-The fixture provider validates packaging contracts only. It is not a Gramlot runtime
-or application. No accepted core provider exists, so Python Source hydration,
-bindings, formulas, controllers, resolver behavior, page navigation, atomic Bag
-replacement, unified print and updated-HTML download remain unverified. A fixture
-JSDOM smoke can check HTML/base64 decoding but cannot change that status. The real
-blocked-network browser gate remains **GS-015-030**.

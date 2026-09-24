@@ -1,56 +1,33 @@
 # Gramlot Standalone
 
-## Try the unified showcase
+Build one JavaScript Gramlot Page into a single HTML file that opens from disk.
+The Page runs in a dedicated Worker using the real Gramlot Host. It is not executed
+at build time, and there is no Python-to-JavaScript compilation.
 
-Download or copy [showcase.zip](showcase.zip), extract the whole archive and open
-`showcase/index.html`. The original shared showcase shell and lessons are included,
-with local runtime, Source viewer and Inspector. The RPC lesson reports that a
-Python backend is unavailable; other lessons run locally. See
-[offline showcase](docs/030-showcase.md) and [verification](examples/showcase/VERIFICATION.md).
-This PoC-based directory export is separate from the pending generic single-file
-compiler integration described below.
+After installing all four locally prepared npm archives (core, NodeJS adapter,
+standalone exporter and Hello World example) into a local consumer directory,
+run from that directory:
 
-`gramlot-standalone` is the offline packaging layer for Python-authored Gramlot
-projects. Its intended command is:
-
-```console
-gramlot-standalone build ./my-site -o my-site.html
+```sh
+npx --no-install gramlot-standalone build node_modules/gramlot-example-app/js/pages/index.js -o build/hello-world.html
 ```
 
-This repository implements project discovery, input containment, local CSS/resource
-embedding, deterministic single-file HTML assembly, a versioned `application_data`
-envelope, provenance/notices, provider validation and atomic output. It does not
-contain a replacement Gramlot runtime.
+Open the generated file in the browser. Node is needed to build it, not to open it.
+The current local dependency artifacts must be installed until the owning packages
+are available upstream; the command above does not imply registry publication.
 
-The clean core does not yet expose the compiler/runtime integration needed to turn
-Python Pages into an offline browser application. Until the bounded ports in
-[GS-015](docs/015-core-port-requirements.md) are accepted, the default command exits
-with a precise missing-provider error and writes no HTML. The hidden explicit
-provider option supports contract development only; it is a proposal, not a core API.
+Applications import Page from `@gramlot/native-html/page`. The same page can run on
+Node, Bun or standalone if it uses only browser-compatible imports. The exporter
+bundles a classic Worker and the Gramlot browser runtime, and uses HtmlBuilder to
+produce the HTML shell. `main` and marked `source` methods execute in the Worker.
 
-## Project layout
+Scope: one JS Page, native HTML and live Source, empty Page.css, no database,
+Data binding, recipes, data import/export or multipage navigation. The old Python
+CLI, compiler provider, complete-v1 profile and TOML configuration are retired;
+there is no compatibility wrapper. The command takes the JS page file directly.
 
-```text
-my-site/
-  pages/
-    index.py
-    reports.py
-  style.css                 # optional bounded CSS subset
-  styles/                   # optional additional CSS
-  resources/                # optional local files embedded as data URLs
-  gramlot-standalone.toml   # optional metadata
-```
+[Usage](docs/010-usage.md) · [Architecture](docs/005-architecture.md) ·
+[Verification](docs/020-verification.md).
 
-See [usage](docs/010-usage.md), [architecture and verified status](docs/005-architecture.md),
-and [required core ports](docs/015-core-port-requirements.md).
-
-## Development
-
-```console
-PYTHONPATH=src:tests python -m unittest discover -s tests -v
-python -m build --no-isolation
-```
-
-The tests use a fixture provider which is not a Gramlot runtime or demo. No package
-publication, release, remote repository, deployment, direct PDF generator, or
-fillable PDF support is part of this work.
+`examples/showcase` and `showcase.zip` are historical PoC artifacts, not output from
+this exporter and not evidence for its supported features. They are unchanged.

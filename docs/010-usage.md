@@ -1,75 +1,41 @@
-# 010 · Project and CLI guide
+# 010 · Usage
 
 Document ID: **GS-010**.
 
-[Concise counterpart](../docs_llm/010-usage.md).
-
 <a id="gs-010-005"></a>
+## 005 · Build
 
-## 005 · Project discovery
+Install the four local npm archives (core, NodeJS adapter, standalone and Hello
+World example) in a consumer directory. From there run:
 
-Block ID: **GS-010-005**.
-
-A project has a flat `pages/` directory. Public filenames are lowercase slugs;
-underscore files are ignored. Standalone resolves and hashes pages without executing
-them. Symlinks for page, style, resource and configuration inputs must remain inside
-their owning project directory.
-
-Optional `gramlot-standalone.toml`:
-
-```toml
-[site]
-id = "my-site"
-title = "My Site"
-schema_version = 1
-initial_page = "index"
+```sh
+npx --no-install gramlot-standalone build node_modules/gramlot-example-app/js/pages/index.js -o dist/hello-world.html
 ```
 
-Without `initial_page`, `index` wins when present, otherwise the first sorted slug.
+The command takes exactly one .js or .mjs page and an .html/.htm output. It does not
+read the old TOML project format. Paths resolve against the current directory.
+Failed builds do not replace an existing output; successful writes are atomic.
 
 <a id="gs-010-010"></a>
+## 010 · Author a page
 
-## 010 · CSS and resources
-
-Block ID: **GS-010-010**.
-
-`style.css` and `styles/**/*.css` are concatenated. `resources/**` files are exposed
-to the provider as data URLs. Simple quoted/unquoted CSS `url(...)` references may
-target these resources; SVG fragments are retained. Remote URLs, query strings,
-path escapes, CSS escapes, HTML style terminators and every `@import` fail with a
-diagnostic. This is an explicit bounded subset, not a complete CSS parser.
-
-Page-owned styles remain Gramlot `styleSheet`/`css` declarations. Project CSS is
-for the document shell and explicitly shared local resources.
-
-<a id="gs-010-015"></a>
-
-## 015 · Build and failure contract
-
-Block ID: **GS-010-015**.
-
-```console
-gramlot-standalone build ./my-site -o my-site.html
+```javascript
+import {Page as BasePage, source} from '@gramlot/native-html/page';
+export class Page extends BasePage {
+    main(root) { root.h1('Hello'); root.section(null, {id:'details'}); }
+    details(root, {text}) { root.p(text); }
+}
+source(Page.prototype.details);
 ```
 
-The output path must end in `.html` or `.htm`. `--build-info receipt.json` writes a
-separate hash/provenance receipt. Output is replaced atomically only after project,
-provider, complete-profile declarations, offline report, pages, JSON data,
-provenance, notices and final HTML pass validation. Missing integration, unsafe CSS
-or invalid provider data writes no HTML.
+Page.main is executed when the HTML opens, not when building. Runtime transport
+is owned by Gramlot. There is no additional standalone Page subclass.
 
-`--provider module:callable` is hidden from normal help. It exists for bounded
-integration development and tests; it is not an accepted core API or production
-fallback. The default proposed location is `gramlot.standalone:compile_project`.
+<a id="gs-010-015"></a>
+## 015 · Open and close
+
+Open the output from disk. globalThis.gramlot is the started instance; its normal
+Source APIs and remoteSource operate without a server. dispose terminates its Worker.
+Runtime startup errors are reported to the browser console. No database is included.
 
 <a id="gs-010-020"></a>
-
-## 020 · Data envelope limits
-
-Block ID: **GS-010-020**.
-
-Envelope JSON is limited to 10,000,000 UTF-8 bytes and 256 nested container levels.
-Duplicate object keys, non-finite numbers, non-JSON values, cycles, mismatched site,
-schema or requested codec fail. Construction detaches the payload from caller-owned
-mutable dictionaries/lists. These checks do not decode or validate typed Bag
-semantics; that remains the provider's responsibility.
